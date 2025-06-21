@@ -29,46 +29,49 @@
 ---
 
 ## 📦 데이터베이스 설계
-
-### 📊 ERD 다이어그램
-
-![image](https://github.com/user-attachments/assets/b78e8534-eb84-49d3-8635-87b86fe77023)
-
-
 ---
 
 ### 🗂️ 테이블 정의
 
 #### 🧍 customer (회원)
-| 컬럼명       | 타입         | 제약조건           | 설명       |
-|--------------|--------------|--------------------|------------|
-| customer_id  | SERIAL       | PRIMARY KEY        | 회원 고유 ID |
-| address      | VARCHAR(100) | UNIQUE, NOT NULL   | 주소        |
-| phone_number | VARCHAR(20)  | UNIQUE, NOT NULL   | 전화번호     |
-| email        | VARCHAR(100) | UNIQUE, NOT NULL   | 이메일 주소  |
+| 컬럼명             | 타입             | 제약조건               | 설명       |
+| --------------- | -------------- | ------------------ | -------- |
+| `customer_id`   | `serial`       | `PRIMARY KEY`      | 회원 고유 ID |
+| `address`       | `varchar(100)` | `UNIQUE, NOT NULL` | 주소       |
+| `phone_number`  | `varchar(20)`  | `UNIQUE, NOT NULL` | 전화번호     |
+| `email`         | `varchar(100)` | `UNIQUE, NOT NULL` | 이메일 주소   |
+| `customer_name` | `varchar(20)`  | `UNIQUE, NOT NULL` | 회원 이름    |
+
 
 #### 🖼️ items (작품)
-| 컬럼명         | 타입          | 제약조건                             | 설명           |
-|----------------|---------------|--------------------------------------|----------------|
-| item_id        | SERIAL        | PRIMARY KEY                          | 작품 고유 ID    |
-| artist         | VARCHAR(100)  | NOT NULL                             | 작가명          |
-| item_name      | VARCHAR(100)  | NOT NULL                             | 작품 제목       |
-| starting_price | NUMERIC(12,2) | NOT NULL                             | 시작 가격       |
-| auction_start  | TIMESTAMP     | NOT NULL                             | 경매 시작일     |
-| auction_end    | TIMESTAMP     | NOT NULL                             | 경매 종료일     |
-| category       | VARCHAR(100)  |                                      | 카테고리        |
-| owner_id       | INTEGER       | FOREIGN KEY → customer(customer_id)  | 소유자 회원 ID  |
-| current_price  | NUMERIC(12,2) | DEFAULT 0                            | 현재 최고가     |
-| image_url      | VARCHAR(255)  |                                      | 이미지 경로      |
+| 컬럼명              | 타입              | 제약조건                                   | 설명           |
+| ---------------- | --------------- | -------------------------------------- | ------------ |
+| `item_id`        | `serial`        | `PRIMARY KEY`                          | 작품 고유 ID     |
+| `artist`         | `varchar(100)`  | `NOT NULL`                             | 작가명          |
+| `item_name`      | `varchar(100)`  | `NOT NULL`                             | 작품 이름        |
+| `starting_price` | `numeric(12,2)` | `NOT NULL`                             | 시작 가격        |
+| `auction_start`  | `timestamp`     | `NOT NULL`                             | 경매 시작 시간     |
+| `auction_end`    | `timestamp`     | `NOT NULL`                             | 경매 종료 시간     |
+| `category`       | `varchar(100)`  |                                        | 카테고리         |
+| `owner_id`       | `varchar`       | `FOREIGN KEY → customer.customer_name` | 소유자 이름 (회원명) |
+| `current_price`  | `numeric(12,2)` | `DEFAULT 0`                            | 현재 최고가       |
+| `image_url`      | `varchar(255)`  |                                        | 이미지 경로       |
+
 
 #### 🧾 activities (입찰 기록)
-| 컬럼명        | 타입          | 제약조건                             | 설명             |
-|---------------|---------------|--------------------------------------|------------------|
-| activity_id   | SERIAL        | PRIMARY KEY                          | 활동 고유 ID      |
-| member_id     | INTEGER       | FOREIGN KEY → customer(customer_id)  | 입찰자 회원 ID     |
-| item_id       | INTEGER       | FOREIGN KEY → items(item_id)         | 입찰한 작품 ID     |
-| price         | NUMERIC(12,2) |                                      | 입찰 금액         |
-| activity_time | TIMESTAMP     | DEFAULT CURRENT_TIMESTAMP            | 입찰 시간         |
+| 컬럼명             | 타입              | 제약조건                                   | 설명           |
+| --------------- | --------------- | -------------------------------------- | ------------ |
+| `activity_id`   | `serial`        | `PRIMARY KEY`                          | 입찰 기록 고유 ID  |
+| `member_id`     | `varchar`       | `FOREIGN KEY → customer.customer_name` | 입찰자 이름 (회원명) |
+| `item_id`       | `integer`       | `FOREIGN KEY → items.item_id`          | 입찰한 작품 ID    |
+| `price`         | `numeric(12,2)` |                                        | 입찰 금액        |
+| `activity_time` | `timestamp`     | `DEFAULT CURRENT_TIMESTAMP`            | 입찰 시간        |
+
+
+### 📊 ERD 다이어그램
+
+![image](https://github.com/user-attachments/assets/3a884105-34af-4680-9a56-a77dd5e1e667)
+
 
 ---
 
@@ -76,9 +79,17 @@
 
 ### 1. 회원 등록
 
-주소, 이메일, 전화번호를 입력하여 회원 등록 가능  
+닉네임, 주소, 이메일, 전화번호를 입력하여 회원 등록 가능  
 
-![g1](https://github.com/user-attachments/assets/c75a3778-f47e-4d12-b8df-4e5ae5c2ef16)
+![image](https://github.com/user-attachments/assets/703ddaee-cee7-4b60-a593-bfbe35a0ca2d)
+
+
+1-(1) 중복 확인
+닉네임이 중복시 이미 존재하는 닉네임이라는 알림이 뜨며 중복 닉네임이 불가
+
+![image](https://github.com/user-attachments/assets/7ad4d65d-910f-4246-8fc2-f3ddd290053b)
+
+
 
 ---
 
@@ -86,29 +97,56 @@
 
 등록된 모든 회원 정보를 테이블로 확인  
 
-![g2](https://github.com/user-attachments/assets/30a30e1a-973e-470c-874e-835624202260)
+![image](https://github.com/user-attachments/assets/8dacf69c-b220-4580-9ad9-d1139709a8ba)
+
 
 ---
 
 ### 3. 회원 ID로 검색
 
 ID 입력 시 특정 회원 정보 조회  
-![회원 검색](https://github.com/user-attachments/assets/4f83f140-9e29-45b7-9b29-de13ed89a1bb)
+![image](https://github.com/user-attachments/assets/e8836d60-0e2a-4cdf-a4e7-4e5135729ae3)
+
 
 ---
 
 ### 4. 회원 삭제
 
+ID를 입력하면 삭제 확인 메시지가 팝업에 뜸
+
+![image](https://github.com/user-attachments/assets/d6977448-4d32-4d89-b7f0-dd10b75cb10e)
+
+삭제 대상 회원 정보와 함께 회원 삭제 성공 여부가 알림으로 뜨게됨
+
+![image](https://github.com/user-attachments/assets/87332c88-4a99-4380-9a24-241bd4349163)
+
+ID가 존재하지 않으면 회원 정보를 찾을 수 없다는 알림이 뜨게 됨
+
+![image](https://github.com/user-attachments/assets/bfcb2a11-5f0e-45cb-81da-5edae8403529)
+
 ID 입력 후 삭제 → 목록에서도 제거됨  
-![회원 삭제 전](https://github.com/user-attachments/assets/deb28bd6-1575-456c-aeb3-9f710eea9584)  
-![회원 삭제 후](https://github.com/user-attachments/assets/73ef65c2-f766-4425-be4f-d6d0cc8fac2f)
+![image](https://github.com/user-attachments/assets/fadc2fc7-e0b7-412b-8b3d-6156ec1f2d93)
+
+
+
 
 ---
 
 ### 5. 회원 정보 수정
 
-주소, 이메일, 전화번호를 수정 가능  
-![회원 수정](https://github.com/user-attachments/assets/118ba1e0-111e-40c1-ac8e-caed43623a95)
+닉네임, 주소, 이메일, 전화번호를 수정 가능  
+
+<strong>수정 전</strong> <strong>과</strong> <strong>수정 후</strong><br>
+<img src="https://github.com/user-attachments/assets/7b73a419-0875-4f6a-b127-12c0d3adb86f" width="300"/>
+<img src="https://github.com/user-attachments/assets/4ab88527-9ea2-46b7-9948-281ad691b1ea" width="300"/>
+
+ID가 존재하지 않으면 회원 정보를 찾을 수 없다는 알림이 뜨게 됨
+![image](https://github.com/user-attachments/assets/66d44ea0-6b92-414b-a00b-3e30be37cec3)
+
+5-(1) 중복 아이디 수정 불가능
+아이디가 중복되게 설정하면 중복된 아이디라는 문구를 띄워 중복 아이디 설정이 불가능하다.
+![image](https://github.com/user-attachments/assets/0fcf7174-cf6f-4a9c-ac6c-49402a83c9de)
+
 
 ---
 
@@ -120,8 +158,9 @@ ID 입력 후 삭제 → 목록에서도 제거됨
 
 ### 1. 경매 작품 등록
 
-이미지 업로드와 함께 작가명, 제목, 시작가, 기간, 카테고리, 소유자 ID 등 입력하여 등록  
-![작품 등록](https://github.com/user-attachments/assets/185a34f3-4dc0-431a-882e-631b5c259eb3)
+이미지 업로드와 함께 작가명, 제목, 시작가, 기간, 카테고리, 소유자 닉네임 등 입력하여 등록  
+![image](https://github.com/user-attachments/assets/fd0f37b2-e262-4021-82ec-8bf77db5f2a5)
+
 
 ---
 
@@ -139,14 +178,16 @@ ID 입력 후 삭제 → 목록에서도 제거됨
 - 같은 사용자의 연속 입찰은 불가 (다른 사용자의 입찰 후 가능)
 
 작품 상세 페이지에서 입찰 가능  
-![입찰 페이지](https://github.com/user-attachments/assets/d1da1b63-7bb9-4ea4-b3fc-ba371b649366)
+![image](https://github.com/user-attachments/assets/1af7deac-240e-4707-8aee-6f12105baaa6)
+
 
 ---
 
 ### 4. 경매 종료 및 낙찰 결과
 
 경매가 종료되면 낙찰자 ID와 낙찰 금액 확인  
-![낙찰 결과](https://github.com/user-attachments/assets/29f3de0d-0c9c-4add-b8df-858f64885d95)
+![image](https://github.com/user-attachments/assets/70f6eb44-2170-455d-818d-6b2df002392a)
+
 
 ---
 
@@ -160,14 +201,16 @@ ID 입력 후 삭제 → 목록에서도 제거됨
 
 입찰 시간, 회원 ID, 물품 ID, 입찰 금액이 실시간으로 기록되어 전체 내역 확인 가능  
 
-![tt1](https://github.com/user-attachments/assets/a2d53a10-d1f0-46f5-a4d3-b70524e61428)
+![image](https://github.com/user-attachments/assets/64c9e9bb-f544-4496-a748-f8d3ecfead86)
+
 
 ---
 
 ### 2. 특정 회원 활동 조회
 
 회원 ID로 검색 시 해당 고객의 모든 활동 기록 조회  
-![tt2](https://github.com/user-attachments/assets/985be4c1-8e79-4c4b-8af2-f85cd4576d9b)
+![image](https://github.com/user-attachments/assets/e7280960-5458-49d2-85d1-bb1c57c04b36)
+
 
 
 ---
